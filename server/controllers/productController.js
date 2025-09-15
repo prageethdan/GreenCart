@@ -1,5 +1,7 @@
 import {v2 as cloudinary} from 'cloudinary';
-import product from '../models/Product.js';
+import Product from '../models/Product.js';
+import fs from "fs";
+
 
 
 export const addProduct = async (req, res) => {
@@ -21,7 +23,8 @@ export const addProduct = async (req, res) => {
 
     await Product.create({
       ...productData,
-      images: imagesUrl,
+      Image: imagesUrl, // match schema field name
+      category: productData.category, // ✅ This is a string!
     });
 
     res.json({ success: true, message: "Product added successfully" });
@@ -59,7 +62,7 @@ export const productById = async (req, res) => {
 export const changeStock = async (req, res) => {
     try{
         const {id, inStock} = req.body;
-        await product.findByIdAndUpdate(id, {inStock});
+        await Product.findByIdAndUpdate(id, {inStock});
         res.json({success: true, message: "Stock updated successfully"});
     }catch (error) {
         console.error("Error updating stock:", error);

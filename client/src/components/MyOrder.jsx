@@ -1,18 +1,32 @@
 import React, { useEffect, useState } from 'react';
 import { useAppContext } from '../contexts/AppContexts';
 import { assets, dummyOrders } from "../assets/assets";
+import toast from 'react-hot-toast';
 
 const MyOrder = () => {
   const [myOrders, setMyOrders] = useState([]);
-  const { currency } = useAppContext();
+  const { currency,axios, user } = useAppContext();
 
   const fetchMyOrders = async () => {
-    setMyOrders(dummyOrders);
-  };
+  try {
+    const { data } = await axios.get("/api/order/all-orders");
+
+    if (data.success) {
+      setMyOrders(data.orders);
+    } else {
+      toast.error(data.message);
+    }
+  } catch (error) {
+    toast.error(error.response?.data?.message || error.message);
+  }
+};
+
 
   useEffect(() => {
+    if(user){
     fetchMyOrders();
-  }, []);
+    }
+  }, [user]);
 
   return (
     <div className="mt-16 pb-16 px-4 md:px-12">

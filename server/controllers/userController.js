@@ -1,4 +1,3 @@
-
 import { User } from "../models/User.js";
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken'; // <-- missing import
@@ -40,7 +39,7 @@ export const registerUser = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    res.status(201).json({ message: 'User registered successfully', user: { id: newUser._id, name: newUser.name, email: newUser.email } });
+    res.status(201).json({ success: true, message: 'User registered successfully', user: { id: newUser._id, name: newUser.name, email: newUser.email } });
 
   } catch (error) {
     console.error('Error registering user:', error);
@@ -80,7 +79,7 @@ export const loginUser = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    res.status(200).json({ message: 'User logged in successfully', user: { id: user._id, name: user.name, email: user.email } });
+    res.status(200).json({ success: true, message: 'User logged in successfully', user: { id: user._id, name: user.name, email: user.email } });
 
   } catch (error) {
     console.error('Error logging in user:', error);
@@ -104,14 +103,19 @@ export const isAuth = async (req, res) => {
 
 export const logoutUser = (req, res) => {
   try {
+    console.log("🔌 Logout request received");   // Log when endpoint is hit
+    console.log("Cookies before clearing:", req.cookies); // Log incoming cookies
+
     res.clearCookie('token', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
     });
-    res.status(200).json({ message: 'User logged out successfully' });
+
+    console.log("✅ Token cookie cleared");
+    res.status(200).json({ success: true, message: 'User logged out successfully' });
   } catch (error) {
-    console.error('Error logging out user:', error);
+    console.error('❌ Error logging out user:', error);
     res.status(500).json({ message: 'Server error' });
   }
-}
+};

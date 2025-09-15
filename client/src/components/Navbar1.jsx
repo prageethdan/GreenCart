@@ -2,18 +2,41 @@ import React, { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { assets } from "../assets/assets";
 import { useAppContext } from "../contexts/AppContexts";
+import { toast } from "react-hot-toast";
 
 const Navbar1 = () => {
   const [open, setOpen] = useState(false);
-  const navigate = useNavigate(); // ✅ use directly here
-  const { user, setShowUserLogin, LogOut, searchQuery, setSearchQuery, getCartCount } = useAppContext();
+  const navigate = useNavigate(); 
+  const { user, setShowUserLogin, searchQuery, setSearchQuery, getCartCount, axios, setUser } = useAppContext();
+
+ // ✅ logout handler (server + local)
+const logOut = async () => {
+  try {
+    const { data } = await axios.post("/api/users/logout"); // this will clear cookie on backend
+    if (data.success) {
+      toast.success(data.message || "Logged out successfully");
+      setUser(null);
+      setShowUserLogin(false);
+      navigate("/");
+    } else {
+      toast.error(data.message || "Logout failed");
+    }
+  } catch (error) {
+    console.error("Logout error:", error);
+    toast.error(error.response?.data?.message || "Logout failed");
+    // still clear local state to force logout
+    setUser(null);
+    setShowUserLogin(false);
+    navigate("/");
+  }
+};
+
 
   useEffect(() => {
-       if (searchQuery.length > 0) {
-          navigate("/products");
-        } 
+    if (searchQuery.length > 0) {
+      navigate("/products");
+    }
   }, [searchQuery]);
-
 
   return (
     <div className="shadow-md">
@@ -81,7 +104,7 @@ const Navbar1 = () => {
                   My orders
                 </li>
                 <li
-                  onClick={LogOut}
+                  onClick={logOut}
                   className="p-1.5 pl-3 hover:bg-primary/10 cursor-pointer"
                 >
                   Logout
@@ -165,7 +188,7 @@ const Navbar1 = () => {
             ) : (
               <button
                 onClick={() => {
-                  LogOut();
+                  logOut();
                   setOpen(false);
                 }}
                 className="cursor-pointer px-8 py-2 bg-primary hover:bg-primary-dull transition text-white rounded-full"

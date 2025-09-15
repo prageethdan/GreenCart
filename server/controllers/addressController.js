@@ -2,15 +2,24 @@ import Address from '../models/Address.js';
 
 export const addAddress = async (req, res) => {
   try {
-    const { userId, addressData } = req.body;
+    const userId = req.user.id; // ✅ from auth middleware
+    const addressData = req.body; // ✅ now frontend sends raw object
 
-    if (!userId || !addressData) {
-      return res.status(400).json({ success: false, message: "Missing user ID or address data" });
+    if (!userId) {
+      return res.status(400).json({ success: false, message: "Missing user ID" });
     }
 
     const newAddress = new Address({
       userId,
-      ...addressData,
+      firstName: addressData.firstName,
+      lastName: addressData.lastName,
+      email: addressData.email,
+      street: addressData.street,
+      city: addressData.city,
+      state: addressData.state,
+      zipcode: addressData.zipcode,
+      country: addressData.country,
+      phone: addressData.phone,
     });
 
     await newAddress.save();
@@ -20,12 +29,13 @@ export const addAddress = async (req, res) => {
     console.error("Error adding address:", error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
-}
+};
+
 
 
 export const getAddressByUserId = async (req, res) => {
     try {
-        const { userId } = req.body;
+           const userId = req.user.id;
     
         if (!userId) {
         return res.status(400).json({ success: false, message: "Missing user ID" });

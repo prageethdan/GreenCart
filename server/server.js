@@ -16,6 +16,7 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 
 await connectDB(); // Connect to MongoDB
+connectCloudinary();
 
 //allow multiple origins
 const allowedOrigins = [
@@ -33,9 +34,10 @@ app.use('/api/users',userRouter);
 app.use('/api/sellers', sellerRouter); 
 app.use('/api/product', productRouter);
 app.use('/api/cart', cartRouter);
-app.use('/api/address', addressRouter);
+app.use('/api/addresses', addressRouter);
 app.use('/api/order', orderRouter);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+

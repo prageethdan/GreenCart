@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import toast from "react-hot-toast";
+import { useAppContext } from "../contexts/AppContexts";
 import { assets } from "../assets/assets";
 
 const InputField = ({ type, placeholder, handleChange, name, address }) => (
@@ -14,6 +16,8 @@ const InputField = ({ type, placeholder, handleChange, name, address }) => (
 );
 
 const AddAddress = () => {
+  const { axios, user, navigate } = useAppContext();
+
   const [address, setAddress] = useState({
     firstName: "",
     lastName: "",
@@ -31,21 +35,36 @@ const AddAddress = () => {
     setAddress((prevAddress) => ({ ...prevAddress, [name]: value }));
   };
 
-  const onSubmitHandler = (e) => {
-    e.preventDefault();
-    console.log("Address submitted:", address);
-    // you can add logic here to save to backend / context
-  };
+  const onSubmitHandler = async (e) => {
+  e.preventDefault();
+  try {
+    const { data } = await axios.post("/api/addresses/add", { ...address });
+    if (data.success) {
+      toast.success(data.message);
+      navigate("/cart");
+    } else {
+      toast.error(data.message);
+    }
+  } catch (error) {
+    toast.error(error.message);
+  }
+};
+  
+
+  useEffect(() => {
+    if (!user) {
+      navigate("/");
+    }
+  }, [user, navigate]);
 
   return (
     <div className="mt-16 pb-16">
       <p className="text-2xl md:text-3xl text-gray-500">
-        Add Shipping{" "}
-        <span className="font-semibold text-primary">Address</span>
+        Add Shipping <span className="font-semibold text-primary">Address</span>
       </p>
 
       <div className="flex flex-col-reverse md:flex-row justify-between mt-10">
-        <div >
+        <div className="flex-1 max-w-md">
           <form onSubmit={onSubmitHandler} className="space-y-3 mt-6 text-sm">
             <div className="grid grid-cols-2 gap-4">
               <InputField
@@ -132,7 +151,7 @@ const AddAddress = () => {
 
         <img
           className="md:mr-16 mb-16 md:mt-0"
-          src={assets.add_address_iamge}
+          src={assets.add_address_iamge} // ✅ fixed typo
           alt="add address"
         />
       </div>

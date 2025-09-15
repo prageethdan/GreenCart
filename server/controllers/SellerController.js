@@ -42,18 +42,19 @@ export const isSellerAuth = async (req, res) => {
   }
 };
 
-export const SellerLogout =async (req, res) => {
+export const SellerLogout = async (req, res) => {
   try {
     res.clearCookie("sellerToken", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
     });
-    res.status(200).json({ message: "Seller logged out successfully" });
+    res.status(200).json({ success: true, message: "Seller logged out successfully" });
   } catch (error) {
     console.error("Error logging out seller:", error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
 
 

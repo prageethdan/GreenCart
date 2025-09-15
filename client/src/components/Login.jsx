@@ -1,39 +1,54 @@
-import React from 'react'
+import React from 'react';
 import { useAppContext } from '../contexts/AppContexts';
+import axios from "axios";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-  const { setShowUserLogin,searchQuery,setSearchQuery} = useAppContext();
+  const { setShowUserLogin, setUser } = useAppContext(); 
+  const navigate = useNavigate();
 
   const [state, setState] = React.useState("login"); // "login" or "register"
   const [name, setName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
 
-  const onSubmitHandler = (e) => {
+  const onSubmitHandler = async (e) => {
     e.preventDefault();
-    setUser({
-        email:"test2@gmail.com",
-        name:"test",
-    })
-    setShowUserLogin(false);
-  }
+    try {
+      const { data } = await axios.post(`/api/users/${state}`, {
+        name,
+        email,
+        password,
+      });
+
+      if (data.success) {
+        setUser(data.user);
+        setShowUserLogin(false);
+        navigate("/");
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message);
+    }
+  };
 
   return (
     <div 
       onClick={() => setShowUserLogin(false)} 
-      className='fixed top-0 bottom-0 left-0 right-0 z-30 flex items-center text-sm text-gray-600 bg-black/50'
+      className="fixed top-0 bottom-0 left-0 right-0 z-30 flex items-center text-sm text-gray-600 bg-black/50"
     >
       <form 
         onSubmit={onSubmitHandler}
         onClick={(e) => e.stopPropagation()} 
         className="flex flex-col gap-4 m-auto items-start p-8 py-12 w-80 sm:w-[352px] text-gray-500 rounded-lg shadow-xl border border-gray-200 bg-white"
       >
-        {/* Title */}
         <p className="text-2xl font-medium m-auto">
-          <span className="text-primary">User</span> {state === "login" ? "Login" : "Sign Up"}
+          <span className="text-primary">User</span>{" "}
+          {state === "login" ? "Login" : "Sign Up"}
         </p>
 
-        {/* Name field only for Sign Up */}
         {state === "register" && (
           <div className="w-full">
             <p>Name</p>
@@ -48,7 +63,6 @@ const Login = () => {
           </div>
         )}
 
-        {/* Email field */}
         <div className="w-full">
           <p>Email</p>
           <input 
@@ -61,7 +75,6 @@ const Login = () => {
           />
         </div>
 
-        {/* Password field */}
         <div className="w-full">
           <p>Password</p>
           <input 
@@ -74,10 +87,9 @@ const Login = () => {
           />
         </div>
 
-        {/* Toggle between login / register */}
         {state === "register" ? (
           <p>
-            Already have account?{" "}
+            Already have an account?{" "}
             <span 
               onClick={(e) => {
                 e.stopPropagation();
@@ -103,7 +115,6 @@ const Login = () => {
           </p>
         )}
 
-        {/* Submit button */}
         <button 
           type="submit" 
           className="bg-primary hover:bg-primary-dull transition-all text-white w-full py-2 rounded-md cursor-pointer"
@@ -112,7 +123,7 @@ const Login = () => {
         </button>
       </form>
     </div>
-  )
-}
+  );
+};
 
 export default Login;

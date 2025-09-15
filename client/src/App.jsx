@@ -19,6 +19,7 @@ import AddProduct from './pages/seller/AddProducts'
 import ProductList from './pages/seller/ProductList'
 import Orders from './pages/seller/Orders'  
 
+
 const App = () => {
   const isSellerPath = useLocation().pathname.includes("seller");
   const { showUserLogin, isSeller } = useAppContext();  // ✅ now works
@@ -37,7 +38,7 @@ const App = () => {
           <Route path='/products/:category/:id' element={<ProductDetails/>} />
           <Route path='/cart' element={<Cart/>} />
           <Route path='/add-address' element={<AddAddress/>} />
-          <Route path='/my-order' element={<MyOrder/>} />
+          <Route path='/my-orders' element={<MyOrder/>} />
           <Route path='/seller' element={isSeller ? <SellerLayout/> : <SellerLogin/>} >
              <Route index element={isSeller ? <AddProduct/>:null} />
              <Route path='product-list' element={<ProductList/>} />

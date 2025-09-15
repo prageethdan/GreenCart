@@ -20,7 +20,7 @@ const ProductCart = ({ product }) => {
         <div className="group cursor-pointer flex items-center justify-center px-7 py-2">
           <img
             className="group-hover:scale-105 transition max-w-26 md:max-w-36"
-            src={product.image}
+            src={product.Image?.[0] || assets.placeholder_img}
             alt={product.name}
           />
         </div>
@@ -46,7 +46,7 @@ const ProductCart = ({ product }) => {
             <p className="md:text-xl text-base font-medium text-primary">
               {currency}${product.offerPrice}{" "}
               <span className="text-gray-500/60 md:text-sm text-xs line-through">
-                {currency}${product.price}
+                {currency}{product.price}
               </span>
             </p>
             <div
