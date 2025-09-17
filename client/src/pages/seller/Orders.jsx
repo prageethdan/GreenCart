@@ -2,17 +2,29 @@ import React, { useEffect, useState } from "react";
 import { useAppContext } from "../../contexts/AppContexts";
 import { dummyOrders } from "../../assets/assets";
 import { assets } from "../../assets/assets";
-
+import toast from "react-hot-toast";
 
 
 const Orders = () => {
   
-    const {currency} = useAppContext()
+    const {currency,axios} = useAppContext()
     const [orders, setOrders] = useState([]);
 
-    const fetchOrders = async () =>{
-         setOrders(dummyOrders)
+    
+    const fetchOrders = async () => {
+      try {
+        const { data } = await axios.get("/api/order/all-orders");
+    
+        if (data.success) {
+          setOrders(data.orders);
+        } else {
+          toast.error(data.message);
+        }
+      } catch (error) {
+        toast.error(error.response?.data?.message || error.message);
+      }
     };
+    
   
     useEffect(()=>{
         fetchOrders();
@@ -29,12 +41,13 @@ const Orders = () => {
                         <img className="w-12 h-12 object-cover" src={assets.box_icon} alt="boxIcon" />
                         <div>
                             {order.items.map((item, index) => (
-                                <div key={index} className="flex flex-col">
-                                    <p className="font-medium">
-                                        {item.product.name}{" "} <span className={"text-primary"}>x {item.quantity}</span>
-                                    </p>
-                                </div>
-                            ))}
+  <div key={index} className="flex flex-col">
+    <p className="font-medium">
+      {item.productId?.name}{" "}
+      <span className={"text-primary"}>x {item.quantity}</span>
+    </p>
+  </div>
+))}
                         </div>
                     </div>
 

@@ -24,7 +24,7 @@ const Cart = () => {
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [paymentOption, setPaymentOption] = useState("COD");
 
-   const placeOrder = async () => {
+  const placeOrder = async () => {
   try {
     if (!selectedAddress) {
       return toast.error("Please select an address");
@@ -41,7 +41,7 @@ const Cart = () => {
           })),
           address: selectedAddress._id,
         },
-        { withCredentials: true } // important if your backend uses cookies
+        { withCredentials: true }
       );
 
       if (data.success) {
@@ -52,12 +52,30 @@ const Cart = () => {
         toast.error(data.message);
       }
     } else {
-      toast.error("Online payment not implemented yet"); // handle stripe/paypal later
+      const { data } = await axios.post(
+        "/api/order/stripe",
+        {
+          userId: user._id,
+          items: cartArray.map((item) => ({
+            productId: item._id,
+            quantity: item.quantity,
+          })),
+          address: selectedAddress._id,
+        },
+        { withCredentials: true }
+      );
+
+      if (data.success) {
+        window.location.replace(data.url);
+      } else {
+        toast.error(data.message);
+      }
     }
   } catch (error) {
     toast.error(error.response?.data?.message || error.message);
   }
 };
+
 
 
   const getCart = () => {

@@ -9,7 +9,8 @@ const MyOrder = () => {
 
   const fetchMyOrders = async () => {
   try {
-    const { data } = await axios.get("/api/order/all-orders");
+    const { data } = await axios.get("/api/order/user-orders");
+    console.log("MyOrder.jsx: Orders fetched from backend:", data);
 
     if (data.success) {
       setMyOrders(data.orders);
@@ -60,54 +61,57 @@ const MyOrder = () => {
 
           {/* Items in this Order */}
           <div className="divide-y divide-gray-200">
-            {order.items.map((item, index) => (
-              <div
-                key={item._id}
-                className="flex flex-col md:flex-row md:items-center justify-between py-6 gap-6"
-              >
-                {/* Product Image + Info */}
-                <div className="flex items-center">
-                  <div className="bg-primary/10 p-4 rounded-xl shadow-inner">
-                    <img
-                      src={item.product.image[0]}
-                      alt={item.product.name}
-                      className="w-20 h-20 object-contain"
-                    />
+            {order.items.map((item, index) => {
+              const product = item.productId; // populated product object
+              return (
+                <div
+                  key={item._id}
+                  className="flex flex-col md:flex-row md:items-center justify-between py-6 gap-6"
+                >
+                  {/* Product Image + Info */}
+                  <div className="flex items-center">
+                    <div className="bg-primary/10 p-4 rounded-xl shadow-inner">
+                      <img
+                        src={product && product.Image ? product.Image[0] : "fallback.jpg"}
+                        alt={product && product.name ? product.name : "Product"}
+                        className="w-20 h-20 object-contain"
+                      />
+                    </div>
+                    <div className="ml-5">
+                      <h2 className="text-lg font-semibold text-gray-800">
+                        {product && product.name ? product.name : "Product"}
+                      </h2>
+                      <p className="text-gray-500">{product && product.category ? product.category : ""}</p>
+                    </div>
                   </div>
-                  <div className="ml-5">
-                    <h2 className="text-lg font-semibold text-gray-800">
-                      {item.product.name}
-                    </h2>
-                    <p className="text-gray-500">{item.product.category}</p>
+
+                  {/* Order Info */}
+                  <div className="flex flex-col justify-center md:ml-8 mb-4 md:mb-0">
+                    <p>
+                      Quantity:{" "}
+                      <span className="font-medium text-gray-800">
+                        {item.quantity || "1"}
+                      </span>
+                    </p>
+                    <p>Status: <span className="capitalize">{order.status}</span></p>
+                    <p>
+                      Date:{" "}
+                      {new Date(order.createdAt).toLocaleDateString("en-US", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </p>
                   </div>
-                </div>
 
-                {/* Order Info */}
-                <div className="flex flex-col justify-center md:ml-8 mb-4 md:mb-0">
-                  <p>
-                    Quantity:{" "}
-                    <span className="font-medium text-gray-800">
-                      {item.quantity || "1"}
-                    </span>
+                  {/* Amount */}
+                  <p className="text-primary text-lg font-bold">
+                    {currency}{product && product.offerPrice ? product.offerPrice * (item.quantity || 1) : ""}
                   </p>
-                  <p>Status: <span className="capitalize">{order.status}</span></p>
-                  <p>
-                    Date:{" "}
-                    {new Date(order.createdAt).toLocaleDateString("en-US", {
-                      day: "numeric",
-                      month: "short",
-                      year: "numeric",
-                    })}
-                  </p>
+                  
                 </div>
-
-                {/* Amount */}
-                <p className="text-primary text-lg font-bold">
-                  {currency}{item.product.offerPrice * (item.quantity || 1)}
-                </p>
-                
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       ))}

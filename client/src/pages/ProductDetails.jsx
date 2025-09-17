@@ -24,8 +24,8 @@ const ProductDetails = () => {
   }, [products, product]);
 
   useEffect(() => {
-    if (product && product.image && product.image.length > 0) {
-      setThumbnail(product.image[0]);
+    if (product && product.Image && product.Image.length > 0) {
+      setThumbnail(product.Image[0]);
     } else {
       setThumbnail(null);
     }
@@ -50,7 +50,7 @@ const ProductDetails = () => {
         <div className="flex flex-col md:flex-row gap-16 mt-4">
           <div className="flex gap-3">
             <div className="flex flex-col gap-3">
-              {product?.image?.map((image, index) =>  (
+              {product?.Image?.map((image, index) =>  (
                 <div
                   key={index} onClick={() => setThumbnail(image)}
                   className="border max-w-24 border-gray-500/30 rounded overflow-hidden cursor-pointer"
